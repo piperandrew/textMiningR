@@ -3,8 +3,8 @@
 ######### CC By 4.0 License ##################
 
 library("tm")
-#library("textstem")
 library("slam")
+#library("textstem")
 
 setwd("~/Data")
 
