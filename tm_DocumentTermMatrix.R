@@ -1,12 +1,42 @@
-###### Preparing Text
+###### Making a Document Term Matrix ########
+######### by Andrew Piper ####################
+######### CC By 4.0 License ##################
 
-#load libraries (you need to do this every time)
 library("tm")
 #library("textstem")
 library("slam")
 
-#Set working directory
 setwd("~/Data")
+
+#### Efficient version no explanation (see below) #####
+corpus1 <- VCorpus(DirSource("txtlab_Novel150_English", encoding = "UTF-8"), readerControl=list(language="English"))
+corpus1 <- tm_map(corpus1, content_transformer(tolower))
+corpus1 <- tm_map(corpus1, content_transformer(removeNumbers))
+f<-content_transformer(function(x, pattern) gsub(pattern, " ", x))
+corpus1 <- tm_map(corpus1, f, "[[:punct:]]")
+corpus1 <- tm_map(corpus1, content_transformer(stripWhitespace)) 
+corpus1.dtm<-DocumentTermMatrix(corpus1, control=list(wordLengths=c(1,Inf)))
+dtm.scaled<-corpus1.dtm/row_sums(corpus1.dtm)
+dtm.tfidf<-weightTfIdf(corpus1.dtm, normalize = TRUE)
+
+#DTM W ONLY STOPWORDS
+stop<-stopwords("en")
+stop<-unlist(strsplit(stop,"[[:punct:]]"))
+stop<-unique(stop)
+#add extra stopwords (specific to novels)
+stop<-append(stop, c("said", "one", "will"))
+stop<-append(stop, tolower(as.roman(1:1000)))
+dtm.stop<-as.matrix(dtm.scaled[ ,which(colnames(dtm.scaled) %in% stop)])
+
+#DTM W NO STOPWORDS + NON-SPARSE WORDS
+dtm.nostop<-dtm.scaled[ ,which(!colnames(dtm.scaled) %in% stop)]
+dtm.sparse<-removeSparseTerms(dtm.nostop, 0.4)
+
+#DTM W TFIFDF VERSION NO STOP, NONSPARSE
+dtm.tfidf<-weightTfIdf(dtm.sparse, normalize = TRUE)
+
+
+######   Now with explanations for toggling on / off   ########## 
 
 #Read in corpus
 #the name in "" is the name of your folder where your texts are
@@ -16,7 +46,6 @@ corpus1 <- tm_map(corpus1, content_transformer(tolower))
 #remove numbers
 corpus1 <- tm_map(corpus1, content_transformer(removeNumbers))
 #remove punctuation
-#corpus1 <- tm_map(corpus1, content_transformer(removePunctuation))
 f<-content_transformer(function(x, pattern) gsub(pattern, " ", x))
 corpus1 <- tm_map(corpus1, f, "[[:punct:]]")
 #strip white space
