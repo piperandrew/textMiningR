@@ -6,7 +6,6 @@ library("kernlab")
 library("caret")
 library("tm")
 library("slam")
-library("splitstackshape")
 
 #set working directory
 setwd("~/Data")
