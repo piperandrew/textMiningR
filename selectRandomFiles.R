@@ -7,8 +7,8 @@
 #you can add cleaning steps if you want to alter the files
 
 #set working director where your source texts are located
-source.texts<-c("")
-target.texts<-c("")
+source.texts<-c("~/Desktop/LordOfTheRings_FanFic")
+target.texts<-c("~/Desktop/LordOfTheRings_FanFic_50")
 setwd(source.texts)
 #get list of files
 fn<-list.files()
