@@ -20,7 +20,7 @@
 #it creates a windowed version of the text and generates a score for each window
 #it then plots those scores for users to inspect their arcs
 
-setwd("~/Research/Granthika/Granthika Metrics 01")
+setwd("")
 
 #ingest lexicon
 #we will condtion on the valence and arousal columns
