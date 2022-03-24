@@ -1,6 +1,6 @@
-######### Chunk Texts      #####################
-######### by Andrew Piper   ####################
-######### CC By 4.0 License   ##################
+#########   Chunk Texts         ###################
+#########   by Andrew Piper     ###################
+#########   CC By 4.0 License   ###################
 
 #This splits texts into uniform length chunks
 #Default length = 1000 words
