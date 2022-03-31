@@ -7,15 +7,16 @@
 #you can add cleaning steps if you want to alter the files
 
 #set working director where your source texts are located
-#source.texts<-c("~/Desktop/LordOfTheRings_FanFic")
+source.texts<-c("~/Desktop/LordOfTheRings_FanFic")
 target.texts<-c("~/Desktop/LordOfTheRings_FanFic_Sample")
+
 setwd(source.texts)
 
 #get list of files
 fn<-list.files()
 
 #sample n files
-n<-500
+n<-100
 fn.s<-sample(fn, n)
 
 #loop through ingest and write
