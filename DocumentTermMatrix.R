@@ -9,13 +9,13 @@ library("slam")
 setwd("~/Data")
 
 #### Efficient version no explanation (see below) #####
-corpus1 <- VCorpus(DirSource("txtlab_Novel150_English", encoding = "UTF-8"), readerControl=list(language="English"))
+corpus1 <- VCorpus(DirSource("PWBS", encoding = "UTF-8"), readerControl=list(language="English"))
 corpus1 <- tm_map(corpus1, content_transformer(tolower))
 corpus1 <- tm_map(corpus1, content_transformer(removeNumbers))
 f<-content_transformer(function(x, pattern) gsub(pattern, " ", x))
 corpus1 <- tm_map(corpus1, f, "[[:punct:]]")
 corpus1 <- tm_map(corpus1, content_transformer(stripWhitespace)) 
-corpus1.dtm<-DocumentTermMatrix(corpus1, control=list(wordLengths=c(1,Inf)))
+corpus1.dtm<-DocumentTermMatrix(corpus1, control=list(wordLengths=c(3,Inf)))
 dtm.scaled<-corpus1.dtm/row_sums(corpus1.dtm)
 dtm.tfidf<-weightTfIdf(corpus1.dtm, normalize = TRUE)
 
@@ -30,7 +30,7 @@ dtm.stop<-as.matrix(dtm.scaled[ ,which(colnames(dtm.scaled) %in% stop)])
 
 #DTM W NO STOPWORDS + NON-SPARSE WORDS
 dtm.nostop<-dtm.scaled[ ,which(!colnames(dtm.scaled) %in% stop)]
-dtm.sparse<-removeSparseTerms(dtm.nostop, 0.4)
+dtm.sparse<-removeSparseTerms(dtm.nostop, 0.3)
 
 #DTM W TFIFDF VERSION NO STOP, NONSPARSE
 dtm.tfidf<-weightTfIdf(dtm.sparse, normalize = TRUE)
