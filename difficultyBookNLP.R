@@ -70,3 +70,9 @@ for (i in 1:length(f.names)){
   difficulty.df<-rbind(difficulty.df, temp.df)
 }
 
+#change wd back to your home directory
+setwd("")
+
+#save
+write.csv(difficulty.df, file="Difficulty.csv", row.names = F)
+
