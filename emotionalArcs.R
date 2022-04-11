@@ -10,14 +10,14 @@
 #it allows you to identify the emotional high and low points so you can read those
 #passages to assess how well the algorithm is working on your documents
 
-#we use the emotion lexicon of the Canadian National Research Council
+#we use the valence, arousal and dominance lexicon of the Canadian National Research Council
 #to measure two kinds of emotions: positive/negative (called "valence")
 #and "intensity" (called "arousal"). Intensity measures the activity/calmness of vocabulary
 
 #this tool takes as input a txt file of the MS
-#to measure "emotion" it uses the NRC emotion lexicon located here:
-#https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm
-#it creates a windowed version of the text and generates a score for each window
+#to measure "emotion" we use the NRC valence-arousal-dominance lexicon located here:
+#http://saifmohammad.com/WebPages/nrc-vad.html
+#the script creates a windowed version of the text and generates a valence/arousal score for each window
 #it then plots those scores for users to inspect their arcs
 
 setwd("")

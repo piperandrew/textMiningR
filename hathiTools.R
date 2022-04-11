@@ -11,7 +11,7 @@
 #It can be incorporated with the Hathi1M data listed here:
 
 
-library(devtools)
+#library(devtools)
 #install_github("xmarquez/hathiTools")
 library(hathiTools)
 library(tidyverse)
@@ -27,13 +27,13 @@ library(ggrepel)
 #this gets the yearly frequency of a set of words within a date range and plots them
 
 #list words
-myWords<-c("democracy", "monarchy", "revolution")
+myWords<-c("tree", "horse")
 
 #get counts
 #lims changes the date range, default = 1750-2000
 result <- query_bookworm(word = myWords, lims = c(1750, 2000), counttype = c("WordsPerMillion", "TextPercent"))
 
-#plot
+#plot individual words
 result %>%
   group_by(word, counttype) %>%
   mutate(rolling_avg = slider::slide_dbl(value, mean, .before = 10, .after = 10)) %>%
@@ -44,6 +44,28 @@ result %>%
   labs(x = "Year", y = "", title = "Books published between 1750-2000",
        subtitle="10-year rolling mean", caption="Source: HathiTrust") +
   theme_bw()
+
+#plot aggregate counts
+
+#get list from external source
+myWords<-dict2[1:20]
+
+#to aggregate words
+result <- query_bookworm(word = myWords, lims = c(1800, 2000), counttype = c("WordsPerMillion"))
+
+#result2<-result[!result$word %in% c("horse", "horses"),]
+
+#sum
+test<-data.frame(tapply(result$value, factor(result$date_year), sum))
+#test<-data.frame(tapply(result2$value, factor(result2$date_year), sum))
+
+test$year<-as.numeric(row.names(test))
+colnames(test)<-c("WordsPerMillion", "Year")
+ggplot(test, aes(x=Year, y=WordsPerMillion))+
+  geom_line(alpha = 0.3) +
+  geom_smooth() +
+  theme_classic()
+
 
 #########   VOLUME COUNTS   #############
 
