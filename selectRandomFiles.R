@@ -7,8 +7,8 @@
 #you can add cleaning steps if you want to alter the files
 
 #set working director where your source texts are located
-source.texts<-c("~/Data/CHICAGO_NOVEL_CORPUS")
-target.texts<-c("~/Data/CHICAGO_CORPUS_SAMPLE_1K")
+source.texts<-c("~/Data/txtlab_CONLIT_subGenres_non/NonNovel_English_Contemporary_BIO")
+target.texts<-c("~/Desktop/NON40")
 
 setwd(source.texts)
 
@@ -16,11 +16,11 @@ setwd(source.texts)
 fn<-list.files()
 
 #subset by external list
-sub<-read.csv("CHICAGO_SAMPLE.csv")
-fn<-fn[fn %in% sub$FILENAME]
+#sub<-read.csv("CHICAGO_SAMPLE.csv")
+#fn<-fn[fn %in% sub$FILENAME]
 
 #sample n files
-n<-1000
+n<-40
 fn.s<-sample(fn, n)
 
 #loop through ingest and write
