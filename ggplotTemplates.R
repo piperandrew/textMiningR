@@ -31,4 +31,21 @@ ggplot(year.df, aes(x=Date, y=Frequency)) +
   #ggtitle("Percentage of ")+
   labs(caption="Source: ")
 
+#boxplot
+#bar graph
+ggplot(df, aes(x=Class, y=value, fill=variable)) +
+  geom_boxplot() +
+  scale_fill_manual(values=c("#56B4E9", "#E69F00")) +
+  #scale_fill_brewer(palette="Dark2") +
+  theme_classic() + 
+  xlab("Category") +
+  ylab("Frequency") +
+  theme(legend.title = element_blank()) +
+  #theme(legend.position = c(0.8, 0.2)) +
+  #theme(legend.text = element_text(size=12))+
+  #theme(legend.position="bottom") +
+  #ggtitle("Percentage of ")+
+  labs(caption="Source: CONLIT")
+
+
 
