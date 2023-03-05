@@ -6,7 +6,7 @@
 #it outputs a random sample of sentences into a table
 
 #set working directory where your source texts are located
-wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
+wd.root<-c("")
 
 setwd(wd.root)
 
