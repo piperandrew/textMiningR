@@ -19,7 +19,7 @@ filenames<-list.files()
 #A. character counts per book
 #B. Concentration ratio of main character
 
-#create emptu final table
+#create empty final table
 count.df<-NULL
 #for every book
 for (i in 1:length(filenames)){

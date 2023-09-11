@@ -47,5 +47,23 @@ ggplot(df, aes(x=Class, y=value, fill=variable)) +
   #ggtitle("Percentage of ")+
   labs(caption="Source: CONLIT")
 
+#side by side plots
+#save as p1, p2 and set number of columns and rows
+library(gridExtra)
+grid.arrange(p1, p2, ncol=2)
 
+#to melt a wide format into long
+library(reshape2)
+#id.vars = the variable(s) you want to keep
+#every other column will be melted into a single column called "value"
+#the old columns will be melted into a single column called "variable"
+ex<-melt(ex.work[,33:35], id.vars=c("word.count"))
+ggplot(data=ex, aes(x=word.count, y=value, color=variable)) +
+  geom_line() +
+  theme_classic()+
+  theme(legend.position="none")+
+  xlab("Word Count") +
+  ylab("KLD") +
+  #ggtitle(levels(factor(kld.all$work))[n]) +
+  labs(caption="Source: CONLIT")
 
