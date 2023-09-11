@@ -1,4 +1,6 @@
 ##### Get Supersense Counts from BookNLP Tables ######
+#This takes as input the old version of bookNLP where the supersenses were a column appended to the token table
+#provides a book level count for each super sense
 
 library(dplyr)
 library(tidyr)
@@ -26,44 +28,44 @@ for (i in 1:length(csv_files)){
   data <- read.csv(csv_files[i], sep = "\t", quote="")
   
   # if chunking
-  if (nrow(data) > 10000){
-  chunk.size<-5000
-  no.chunks<-floor(nrow(data)/chunk.size)
-  #this skips the first / last 5K words
-  for (j in 1:(no.chunks-1)){
-    sub<-data[(j*chunk.size):(((j+1)*chunk.size)-1),]
-    if (nrow(sub) > 4900){
-    sub<-sub[-grep("I-", sub$supersense),]
-    sub<-sub[-grep("O", sub$supersense),]
-    if (nrow(sub) > 10) {
-      # Get the counts of each level of the "SuperSense" factor
-      counts <- table(sub$supersense)
-      
-      # Create a data frame with the counts and filename
-      filename<-paste(csv_files[i], j, sep="_")
-      counts_df <- data.frame(filename, counts)
-      
-      # Append the counts to the final table
-      final_table <- bind_rows(final_table, counts_df)
-    }
-  }
-  }
-  }
-  
-  # #if no chunking
-  # data<-data[-grep("I-", data$supersense),]
-  # data<-data[-grep("O", data$supersense),]
-  # 
-  # if (nrow(data) > 10) {
-  #   # Get the counts of each level of the "SuperSense" factor
-  #   counts <- table(data$supersense)
-  #   
-  #   # Create a data frame with the counts and filename
-  #   counts_df <- data.frame(filename = basename(csv_files[i]), counts)
-  #   
-  #   # Append the counts to the final table
-  #   final_table <- bind_rows(final_table, counts_df)
+  # if (nrow(data) > 10000){
+  # chunk.size<-5000
+  # no.chunks<-floor(nrow(data)/chunk.size)
+  # #this skips the first / last 5K words
+  # for (j in 1:(no.chunks-1)){
+  #   sub<-data[(j*chunk.size):(((j+1)*chunk.size)-1),]
+  #   if (nrow(sub) > 4900){
+  #   sub<-sub[-grep("I-", sub$supersense),]
+  #   sub<-sub[-grep("O", sub$supersense),]
+  #   if (nrow(sub) > 10) {
+  #     # Get the counts of each level of the "SuperSense" factor
+  #     counts <- table(sub$supersense)
+  #     
+  #     # Create a data frame with the counts and filename
+  #     filename<-paste(csv_files[i], j, sep="_")
+  #     counts_df <- data.frame(filename, counts)
+  #     
+  #     # Append the counts to the final table
+  #     final_table <- bind_rows(final_table, counts_df)
+  #   }
   # }
+  # }
+  # }
+  
+  #if no chunking
+  data<-data[-grep("I-", data$supersense),]
+  data<-data[-grep("O", data$supersense),]
+
+  if (nrow(data) > 10) {
+    # Get the counts of each level of the "SuperSense" factor
+    counts <- table(data$supersense)
+
+    # Create a data frame with the counts and filename
+    counts_df <- data.frame(filename = basename(csv_files[i]), counts)
+
+    # Append the counts to the final table
+    final_table <- bind_rows(final_table, counts_df)
+  }
 }
 
 #if chunking divide by chunk.size
