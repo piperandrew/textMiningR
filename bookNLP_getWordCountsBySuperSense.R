@@ -1,4 +1,4 @@
-#######  Get Token Counts by Supersense bookNLP  #########
+#######  Get Word Counts by Supersense bookNLP  #########
 #This gets counts for all words associated with each supersense in bookNLP
 #Helps identify most frequent words for each supersense given an input corpus
 

@@ -1,6 +1,6 @@
 ## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
 ##   data: a data frame.
-##   measurevar: the name of a column that contains the variable to be summariezed
+##   measurevar: the name of a column that contains the variable to be summarized
 ##   groupvars: a vector containing names of columns that contain grouping variables
 ##   na.rm: a boolean that indicates whether to ignore NA's
 ##   conf.interval: the percent range of the confidence interval (default is 95%)

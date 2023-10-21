@@ -51,7 +51,7 @@ prep_word2vec("Novel_English_19C","Novel_English_19C.txt",lowercase=T)
 
 #import .txt model
 #sample from https://nlp.stanford.edu/projects/glove/
-model<-read.vectors("glove.6B.50d.txt")
+model<-read.vectors("glove.6B.100d.txt")
 
 #find nearst words
 nearest_to(model, model[[c("frog")]], 10)

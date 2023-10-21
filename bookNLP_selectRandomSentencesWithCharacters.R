@@ -1,13 +1,15 @@
-######### Select Random Sentences bookNLP   ####################
+######### Select Random Sentences with Characters ####################
 ######### by Andrew Piper ####################
 ######### CC By 4.0 License ##################
 
 #this script takes as input a directory of bookNLP files
 #it outputs a random sample of sentences into a table
 #it has the following conditions
-#a. only keeps nameed characters
+#a. only keeps named characters
 #b. who are in the subject position
 #c. in sentences not in dialogue
+
+library(stringr)
 
 #load metadata
 setwd("/Users/akpiper/Data")
@@ -26,11 +28,11 @@ fn<-list.files()
 fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
 
 #sample n files
-n<-100
+n<-20
 fn.s<-sample(fn, n)
 
-#sample s sentences per file
-s=2
+#sample s sentences in a row per file
+s=10
 
 #create empty final table
 final.df<-NULL
@@ -111,6 +113,20 @@ for (i in 1:length(fn.s)){
   fileID<-fn.s[i]
   temp.df<-data.frame(fileID,p)
   final.df<-rbind(final.df, temp.df)
+}
+
+setwd("/Users/akpiper/Research/Character Cognition")
+write.csv(final.df, file="Test01.csv", row.names = F)
+
+#add id to each row
+library(stringi)
+final.df$ID<-paste(stri_rand_strings(nrow(final.df), 6, pattern = "[A-Za-z0-9]"), ".txt", sep="")
+
+#write texts to files
+setwd("/Users/akpiper/Research/Character Cognition/CharacterCognition_Test")
+
+for (i in 1:nrow(final.df)){
+  write(final.df[i,2], file=final.df$ID[i])
 }
 
 
