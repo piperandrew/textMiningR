@@ -26,9 +26,6 @@ emb <- as.matrix(model)
 #top_n = the number of similar words to return
 predict(model, c("human"), type = "nearest", top_n = 10)
 
-#find similarity between two terms
-word2vec_similarity(emb["human", ], emb["nature", ], top_n = 1)
-
 #create artificial vectors by adding or subtracting word vectors
 vector <- emb["human", ] - emb["animal", ]
 predict(model, vector, type = "nearest", top_n = 10)
@@ -42,7 +39,7 @@ predict(model, vector, type = "nearest", top_n = 10)
 library("devtools")
 library(magrittr)
 library(wordVectors)
-devtools::install_github("bmschmidt/wordVectors")
+#devtools::install_github("bmschmidt/wordVectors")
 remotes::install_github("bmschmidt/wordVectors", ref="lite")
 
 #export directory of txt files as a single txt file to build model
@@ -59,4 +56,8 @@ nearest_to(model, model[[c("frog", "frogs")]], 10)
 nearest_to(model,model[["girl"]]-model[["boy"]])
 cosineSimilarity(model[["rock"]], model[["boulder"]])
 cosineSimilarity(model[[c("rock", "rocks")]], model[["lamp"]])
+
+cosine(emb[rownames(emb)=="human",], emb[rownames(emb)=="humans",])
+
+cosineSimilarity(emb["rock",], emb["boulder",])
 
