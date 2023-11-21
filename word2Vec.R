@@ -11,13 +11,13 @@ library(word2vec)
 #type = word2vec model (cbow or skip-gram)
 #window = skip length between words -- larger equals larger context of words that can be similar
 #dim = dimensions of the word vectors, 50 is default, large models use 300
-nyt<-word2vec("NYT.txt", type = "cbow", window=5, threads=3, dim=50, min_count=10)
+model<-word2vec("CONLIT_Cleaned.txt", type = "cbow", window=10, threads=3, dim=100, min_count=10)
 
 #save model
-write.word2vec(nyt, "NYT.bin", type = "bin")
+write.word2vec(model, "CONLIT_Cleaned.bin", type = "bin")
 
 #read model
-model<-read.word2vec("20CPOetryAll.bin", normalize = T) #normalize = T!!!
+model<-read.word2vec("NYT_Model.bin", normalize = T) #normalize = T!!!
 
 #create matrix
 emb <- as.matrix(model)
@@ -60,4 +60,50 @@ cosineSimilarity(model[[c("rock", "rocks")]], model[["lamp"]])
 cosine(emb[rownames(emb)=="human",], emb[rownames(emb)=="humans",])
 
 cosineSimilarity(emb["rock",], emb["boulder",])
+
+
+####### Prepare texts for making model in Terminal #######
+#Takes as input all .txt files in a directory you are in and outputs them to a folder
+#in that directory called "combined"
+cat *.txt > combined/combined.txt
+
+####### Prepare Texts for Making Model by first cleaning them #######
+text.prep<-function(x){
+  #first scan in the document
+  work<-scan(x, what="character", quote="", quiet=T)
+  #remove numbers
+  work<-gsub("\\d", "", work)
+  #split on punctuation
+  work<-unlist(strsplit(work,"[[:punct:]]"))
+  #make all lowercase
+  work<-tolower(work)
+  #remove blanks
+  work<-work[work != ""]
+}
+
+setwd("/Users/akpiper/Data/")
+meta<-read.csv("CONLIT_META.csv")
+
+setwd("/Users/akpiper/Data/CONLIT/")
+
+fn<-list.files()
+fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
+
+for (i in 1:length(fn)){
+  
+  print(i)
+  
+  #ingest and clean work
+  work<-text.prep(fn[i])
+  
+  #paste
+  
+  #change wd 
+  
+  #write as .txt file
+  
+}
+  
+
+
 
