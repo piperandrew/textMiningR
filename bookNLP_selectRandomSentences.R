@@ -1,7 +1,8 @@
 ######### Select Random Sentences bookNLP   ####################
 ######### by Andrew Piper ####################
 ######### CC By 4.0 License ##################
-
+library(stringi)
+library(stringr)
 #Version 1:
 #this script takes as input a directory of bookNLP files
 #it outputs a random sample of sentences into a table
@@ -22,19 +23,18 @@ setwd(wd.root)
 fn<-list.files()
 
 #subset by categories
-#fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
-#fn<-fn[fn %in% meta$ID[meta$Genre == "PW"]]
+fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
 
 #sample n documents
-n<-1000
+n<-100
 fn.s<-sample(fn, n)
 #fn.s<-fn
 
 #set number of sample sentences per book (these are sequential)
-s=1
+s=3
 
-#select number of passages to extract per book (of sequential sentences s)
-pass<-5
+#select number of passages to extract per book (of s sequential sentences)
+pass<-1
 
 ###### Version 1 ######
 
@@ -79,7 +79,7 @@ for (i in 1:length(fn.s)){
     final.df<-rbind(final.df, temp.df)
   }
 }
-
+write.csv(final.df, file="CONLIT_Sample_100_ForConcreteness.csv", row.names = F)
  
 ###### Version 2 ######
 

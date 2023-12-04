@@ -7,7 +7,7 @@ library(dplyr)
 
 #set root working directory
 #wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
-wd.root<-c("/Users/akpiper/Data/CONLIT_NLP_PageSamples_Supersense/")
+wd.root<-c("/Users/akpiper/Research/WorldLit/WORLDLIT1.0_TXT_EN_bookNLP/")
 
 setwd(wd.root)
 
@@ -19,7 +19,7 @@ final.df<-NULL
 
 #for every book
 for (i in 1:length(filenames)){
-  
+
   print(i)
   
   #setwd to the i-th book
@@ -47,6 +47,9 @@ for (i in 1:length(filenames)){
     #turn into data frame
     super.table<-as.data.frame(super.table)
     
+    #make sure it was populated
+    if (nrow(super.table) > 0){
+      
     if (i == 1){
       final.df<-super.table
     } else {
@@ -54,7 +57,8 @@ for (i in 1:length(filenames)){
       final.df<-merge(final.df, super.table, by=c("Var1"), all=TRUE)
     }
     #rename columns
-    colnames(final.df)[i+1]<-filenames[i]
+    colnames(final.df)[length(colnames(final.df))]<-filenames[i]
+    }
   }
 }
 
@@ -68,5 +72,5 @@ df<-apply(df, 2, as.numeric)
 df<-as.data.frame(df)
 df$filename<-filename
 
-setwd("/Users/akpiper/Data/")
-write.csv(df, file="CONLIT_NLP_PageSamples_Supersense.csv", row.names = F)
+#setwd("/Users/akpiper/Data/")
+write.csv(df, file="WORLDLIT1.0_TXT_EN_bookNLP_Supersense.csv", row.names = F)
