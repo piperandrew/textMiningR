@@ -1,5 +1,6 @@
 #############   Inter-Rater Agreement   ############
 library(irr)
+library(caret)
 setwd("/Users/akpiper/Research/Character Cognition")
 setwd("/Users/akpiper/Desktop")
 #these scripts help measure inter-rater agreement under different conditions
@@ -90,28 +91,11 @@ majority_label<-calculate_majority(a)
 #table to get % for each label
 table(majority_label)/ length(majority_label)
 
-##### review labels #####
+####### Calculate F1 on Human Labels #######
+true_labels <- c(...) # Your actual labels
+predicted_labels <- c(...) # Your predicted labels
 
-#table annotations for each annotator
-table(a$anya.labelle.mail.mcgill.ca)
-table(a$aarshiyaa.sharma.gmail.com)
-
-#for each class being evaluated (cognition, emotion, etc) how many times did GPT
-#think it was present (1) versus not-present (0)
-tapply(a$Value, factor(a$Class), function (x) table(x))
-
-#for each class being evaluated (cognition, emotion, etc) how many times did annotators
-#agree with each other about GPTs label?
-tapply(a$agreement, factor(a$Class), function (x) table(x))
-
-#for each GPT value (present(1)/not-present(0)) the level of annotator agreement (2,1)
-tapply(a$agreement, a$Value, function (x) table(x))
-
-#for a given coder the rate of "agreement" based on GPT positive/negative
-tapply(a$anya.labelle.mail.mcgill.ca, a$Value, function (x) table(x))
-tapply(a$aarshiyaa.sharma.gmail.com, a$Value, function (x) table(x))
-
-
-
+# Calculate the confusion matrix
+conf_matrix <- confusionMatrix(data = predicted_labels, reference = true_labels)
 
 

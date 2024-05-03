@@ -2,21 +2,25 @@
 ######### by Andrew Piper ####################
 ######### CC By 4.0 License ##################
 
-ggplot(df, aes(x=year, y=percent, color = genre)) +
-  #geom_point() +
-  geom_line() +
+ggplot(history.df, aes(x=period, y=mean, color=genre)) +
+  geom_point(shape = 15, size = 3) +
+  geom_line(linetype = "dotted") +
   #scale_colour_manual(values=c("black", "grey60")) +
   scale_colour_manual(values=c("deeppink", "grey40")) +
   #theme_bw() + 
   theme_classic() + 
-  xlab("Year") +
-  ylab("Percent") +
-  theme(legend.title = element_blank()) +
+  xlab("Period") +
+  ylab("Model Accuracy") +
+  #theme(legend.title = element_blank()) +
   #theme(legend.position = c(0.8, 0.2)) +
-  theme(legend.text = element_text(size=12))+
+  #theme(legend.text = element_text(size=12))+
   #theme(legend.position="bottom") +
   #ggtitle("Percentage of ")+
-  labs(caption="Source: ")
+  #labs(
+  #  caption="Source:",
+  #  title="Your Main Title Here",  # Add your main title
+  #  subtitle="Your Subtitle Here"  # Add your subtitle
+  #)
 
 #bar graph
 ggplot(year.df, aes(x=Date, y=Frequency)) +
@@ -30,6 +34,29 @@ ggplot(year.df, aes(x=Date, y=Frequency)) +
   #theme(legend.position="bottom") +
   #ggtitle("Percentage of ")+
   labs(caption="Source: ")
+
+#bar graph with BW patterns 
+library(ggpattern)
+
+ggplot(b_filtered, aes(x=reorder(Feature, -Freq), y=Freq)) +
+  geom_bar_pattern(
+    aes(pattern = Category), # Define pattern by Category
+    stat = "identity",
+    fill = "white", # Ensure base fill is white
+    colour = "grey60", # Outline color of the bars
+    #pattern = "stripe", # Default pattern, you can remove this line if using scale_pattern_manual
+    pattern_density = 0.05, # Adjust density of the pattern
+    pattern_spacing = 0.02, # Adjust spacing between pattern lines
+    pattern_key_scale_factor = 0.7 # Adjust the scale of the pattern in the legend
+  ) +
+  #scale_pattern_fill_manual(values=c("stripe", "dot", "plaid")) + # Manually set patterns for each category
+  theme_classic() + 
+  xlab("Narrative Feature") +
+  ylab("Number of Times Chosen") +
+  theme(legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) + # Rotate x-axis text
+  labs(caption="Source: GPT-4")
+
 
 #boxplot
 #bar graph

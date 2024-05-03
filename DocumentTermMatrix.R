@@ -2,14 +2,23 @@
 ######### by Andrew Piper ####################
 ######### CC By 4.0 License ##################
 
+#assumes you have a directory of .txtfiles
+
 library("tm")
 library("slam")
 #library("textstem")
 
 setwd("~/Data")
-
 #### Efficient version no explanation (see below) #####
+
+#for texts from a directory
 corpus1 <- VCorpus(DirSource("PWBS", encoding = "UTF-8"), readerControl=list(language="English"))
+
+#for texts from a table
+#corpus1 <- VCorpus(VectorSource(my_table$text_column), readerControl = list(language = "English"))
+#add metadata
+#meta(my_corpus2, tag = "From") <- c("String1", "String2", "String3")
+
 corpus1 <- tm_map(corpus1, content_transformer(tolower))
 corpus1 <- tm_map(corpus1, content_transformer(removeNumbers))
 f<-content_transformer(function(x, pattern) gsub(pattern, " ", x))

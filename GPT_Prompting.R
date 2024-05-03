@@ -21,7 +21,7 @@ hey_chatGPT <- function(answer_my_question) {
     content_type_json(),
     encode = "json",
     body = list(
-      model = "gpt-4-0613", #gpt-4-1106-preview gpt-3.5-turbo-0301, gpt-3.5-turbo-0613, gpt-3.5-turbo-16k-0613, gpt-4-0613, gpt-4-32k
+      model = "gpt-4-0125-preview", #"gpt-4-0613", #gpt-4-1106-preview gpt-3.5-turbo-0301, gpt-3.5-turbo-0613, gpt-3.5-turbo-16k-0613, gpt-4-0613, gpt-4-32k
       temperature = 0,
       messages = list(
         list(

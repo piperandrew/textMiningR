@@ -7,58 +7,66 @@
 #it has the following conditions
 #a. only keeps named characters
 #b. who are in the subject position
-#c. in sentences not in dialogue
+#c. in sentences not in dialogue (optional)
 
-library(stringr)
-
-#load metadata
 setwd("/Users/akpiper/Data")
 meta<-read.csv("CONLIT_META.csv")
 
-#set working directory where your source texts are located
-#make sure to include final backslash
+#set root working directory
 wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
 
 setwd(wd.root)
 
-#get list of files
-fn<-list.files()
+#get list of folders (i.e. books)
+filenames<-list.files()
 
-#subset by genre
-fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
+#OPTION: subset by metadata
+file.sub<-sub("\\..*$", "", filenames)
+#fiction
+file.fic<-sub("\\..*$", "", meta$ID[meta$Category == "FIC"])
+file.sub<-file.sub[file.sub %in% file.fic]
+#3P
+file.3p<-sub("\\..*$", "", meta$ID[meta$Probability1P < 0.05])
+file.sub<-file.sub[file.sub %in% file.3p]
+#remove ROM
+file.rom<-sub("\\..*$", "", meta$ID[meta$Genre == "ROM"])
+file.sub<-file.sub[!file.sub %in% file.rom]
+file.sub<-unique(file.sub)
 
-#sample n files
-n<-20
-fn.s<-sample(fn, n)
+#establish parameters
 
-#sample s sentences in a row per file
-s=10
+#sample n documents
+n<-50
+fn.s<-sample(file.sub, n)
+#fn.s<-file.sub
+
+#set number of context sentences prior to target sentence with character
+c=2
+#set number of following sentences (c+s+1 = total sentences per passage)
+s=2
+
+#select number of passages to extract per book (of s sequential sentences)
+pass<-1
+
+#subset filenames
+filenames2<-filenames[sub("\\..*$", "", filenames) %in% fn.s]
 
 #create empty final table
 final.df<-NULL
 
-#loop through ingest and write
+#for every book
 for (i in 1:length(fn.s)){
+  
   print(i)
   
-  #setwd to the i-th book
-  wd.file<-paste(wd.root, fn.s[i], sep="")
-  setwd(wd.file)
-  
-  #get all book files
-  book.files<-list.files()
-  
-  #load tokens table
-  tokens<-book.files[grep(".tokens", book.files)]
-  tokens.df<-read.csv(tokens, quote="", sep="\t")
+  #load tokens file
+  tokens.df<-read.csv(paste(fn.s, ".tokens", sep="")[i], quote="", sep="\t")
   
   #load dialogue table
-  quotes<-book.files[grep(".quotes", book.files)]
-  quotes.df<-read.csv(quotes, quote="", sep="\t")
+  quotes.df<-read.csv(paste(fn.s, ".quotes", sep="")[i], quote="", sep="\t")
   
   #load character table
-  char<-book.files[grep(".entities", book.files)]
-  char.df<-read.csv(char, quote="", sep="\t")
+  char.df<-read.csv(paste(fn.s, ".entities", sep="")[i], quote="", sep="\t")
   char.df<-char.df[char.df$cat == "PER",]
   #keep only proper names
   char.df<-char.df[char.df$prop == "PROP",]
@@ -85,35 +93,42 @@ for (i in 1:length(fn.s)){
   tokens.df2<-tokens.df1[tokens.df1$sentence_ID %in% tokens.char$sentence_ID,]
   
   #further remove sentences in dialogue
-  #get all sentences in dialogue
-  sub<-tokens.df[tokens.df$token_ID_within_document %in% quotes.df$quote_start,]
   
+  #get all sentences with dialogue
+  sequences <- unlist(mapply(seq, from=quotes.df$quote_start, to=quotes.df$quote_end))
+  dia.df<-tokens.df[tokens.df$token_ID_within_document %in% sequences,]
+
   #subset tokens table by removing these sentences
-  tokens.df2<-tokens.df2[!tokens.df2$sentence_ID %in% sub$sentence_ID,]
+  tokens.df2<-tokens.df2[!tokens.df2$sentence_ID %in% dia.df$sentence_ID,]
   
-  for (j in 1:200){
-    #get random starting point from sentences
-    start<-sample(unique(tokens.df2$sentence_ID), 1)
-    samp.s<-seq(from=start, to=(start+(s-1)), by=1)
-    tokens.s<-tokens.df[tokens.df$sentence_ID %in% samp.s,]
-    #check if those sentences are in dialogue table, resample if so
-    if (length(which(unique(tokens.s$sentence_ID) %in% sub$sentence_ID)) == 0){
-      break
+  for (j in 1:pass){
+    
+    for (j in 1:200){
+      #get random starting point from sentences
+      start<-sample(unique(tokens.df2$sentence_ID), 1)
+      #start c sentences prior to target sentence and s sentences after
+      samp.s<-seq(from=(start-c), to=(start+s), by=1)
+      tokens.s<-tokens.df[tokens.df$sentence_ID %in% samp.s,]
+      #check if those sentences are in dialogue table, resample if so
+      if (length(which(unique(tokens.s$sentence_ID) %in% dia.df$sentence_ID)) == 0){
+        break
+      }
     }
+  
+    #combine into a single passage
+    p<-paste(tokens.s$word, sep=" ", collapse=" ")
+    
+    #remove spaces between punctuation and n't
+    p<-str_replace_all(p, "\\s+(?=\\p{P})", "")
+    p<-str_replace_all(p, "\\s+(?=n’t\\b)", "")
+    
+    #build table
+    fileID<-fn.s[i]
+    temp.df<-data.frame(fileID,p)
+    final.df<-rbind(final.df, temp.df)
   }
-  
-  #combine into a single passage
-  p<-paste(tokens.s$word, sep=" ", collapse=" ")
-  
-  #remove spaces between punctuation and n't
-  p<-str_replace_all(p, "\\s+(?=\\p{P})", "")
-  p<-str_replace_all(p, "\\s+(?=n’t\\b)", "")
-  
-  #build table
-  fileID<-fn.s[i]
-  temp.df<-data.frame(fileID,p)
-  final.df<-rbind(final.df, temp.df)
 }
+
 
 setwd("/Users/akpiper/Research/Character Cognition")
 write.csv(final.df, file="Test01.csv", row.names = F)

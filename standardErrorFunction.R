@@ -1,3 +1,42 @@
+#### Simpler version #####
+
+#Calculate CI on measurements for multiple groups
+#takes as input two columns of a data frame: the measure and the groups
+
+calculate_metrics_by_group <- function(data_column, group_column) {
+  # Combine the data into a data frame
+  data_df <- data.frame(value = data_column, group = factor(group_column))
+  
+  # Calculate the metrics by group
+  results <- do.call(rbind, lapply(split(data_df$value, data_df$group), function(group_data) {
+    n <- length(group_data)
+    mean_val <- mean(group_data, na.rm = T)
+    sd_val <- sd(group_data, na.rm = T)
+    se_val <- sd_val / sqrt(n)
+    ci_lower_val <- mean_val - qt(0.975, df=n-1) * se_val
+    ci_upper_val <- mean_val + qt(0.975, df=n-1) * se_val
+    
+    return(data.frame(Mean = mean_val, SD = sd_val, SE = se_val, CI_Lower = ci_lower_val, CI_Upper = ci_upper_val))
+  }))
+  
+  # Add the group names to the results
+  rownames(results) <- levels(factor(group_column))
+  
+  return(results)
+}
+
+#For a single group
+calculate_metrics <- function(data_column) {
+  n <- length(data_column)
+  mean <- mean(data_column)
+  sd <- sd(data_column)
+  se <- sd / sqrt(n)
+  ci_lower <- mean - qt(0.975, df=n-1) * se
+  ci_upper <- mean + qt(0.975, df=n-1) * se
+  
+  return(c(mean=mean, sd=sd, se=se, ci_lower=ci_lower, ci_upper=ci_upper))
+}
+
 ## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
 ##   data: a data frame.
 ##   measurevar: the name of a column that contains the variable to be summarized

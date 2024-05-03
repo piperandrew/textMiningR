@@ -3,12 +3,79 @@
 #INPUT: directory of bookNLP tables
 #OUPUT: single table of supersense counts by book normalized by total tokens
 
+#Version 1 = When all files are in a single directory
+#Version 2 = When files are imbedded in book directories
+
 library(dplyr)
 
+####### VERSION 1 ########
+
+#set root working directory
+wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
+
+setwd(wd.root)
+
+#get list of folders (i.e. books)
+filenames<-list.files()
+
+#subset by .super files
+file.super<-filenames[grep(".super", filenames)]
+
+#create empty final table
+final.df<-NULL
+
+#for every book
+for (i in 1:length(file.super)){
+
+  print(i)
+  
+  #load supersense file
+  super.df<-read.csv(file.super[i], quote="", sep="\t")
+
+  #table supersense types
+  super.table<-table(super.df$supersense_category)
+    
+  #normalize by word count
+  super.table<-super.table/max(super.df$end_token)
+  
+  #turn into data frame
+  super.table<-as.data.frame(super.table)
+    
+  #make sure it was populated
+  if (nrow(super.table) > 0){
+      
+    if (i == 1){
+      final.df<-super.table
+    } else {
+    #add to meta table
+      final.df<-merge(final.df, super.table, by=c("Var1"), all=TRUE)
+    }
+    #rename columns
+    colnames(final.df)[length(colnames(final.df))]<-file.super[i]
+  }
+}
+
+#transpose columns to rows and clean up
+df<-as.data.frame(t(final.df))
+colnames(df)<-df[1,]
+df<-df[-1,]
+df[is.na(df)]<-0
+filename<-row.names(df)
+df<-apply(df, 2, as.numeric)
+df<-as.data.frame(df)
+df$filename<-filename
+
+#clean filenames
+df$filename<-gsub(".supersense", ".txt", df$filename)
+
+setwd("/Users/akpiper/Data/")
+write.csv(df, file="CONLIT_SUPERSENSE.csv", row.names = F)
+
+####### VERSION 2 ##########
 #set root working directory
 #wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
-wd.root<-c("/Users/akpiper/Research/WorldLit/WORLDLIT1.0_TXT_EN_bookNLP/")
-
+#wd.root<-c("/Users/akpiper/Research/WorldLit/WORLDLIT1.0_TXT_EN_bookNLP/")
+wd.root<-c("/Users/akpiper/Research/GPT_ConfoundingStoryGeneration_01/GPT_NonFic_Neutral_bookNLP/")
 setwd(wd.root)
 
 #get list of folders (i.e. books)
@@ -19,7 +86,7 @@ final.df<-NULL
 
 #for every book
 for (i in 1:length(filenames)){
-
+  
   print(i)
   
   #setwd to the i-th book
@@ -35,29 +102,27 @@ for (i in 1:length(filenames)){
     #load supersense file
     super<-book.files[grep(".supersense", book.files)]
     super.df<-read.csv(super, quote="", sep="\t")
-    #super.df<-read.csv(filenames[i])
-    
+
     #table supersense types
     super.table<-table(super.df$supersense_category)
     
     #normalize by word count
     super.table<-super.table/max(super.df$end_token)
-    #super.table<-super.table/nrow(super.df)
-    
+
     #turn into data frame
     super.table<-as.data.frame(super.table)
     
     #make sure it was populated
     if (nrow(super.table) > 0){
       
-    if (i == 1){
-      final.df<-super.table
-    } else {
-    #add to meta table
-      final.df<-merge(final.df, super.table, by=c("Var1"), all=TRUE)
-    }
-    #rename columns
-    colnames(final.df)[length(colnames(final.df))]<-filenames[i]
+      if (i == 1){
+        final.df<-super.table
+      } else {
+        #add to meta table
+        final.df<-merge(final.df, super.table, by=c("Var1"), all=TRUE)
+      }
+      #rename columns
+      colnames(final.df)[length(colnames(final.df))]<-filenames[i]
     }
   }
 }
@@ -73,4 +138,8 @@ df<-as.data.frame(df)
 df$filename<-filename
 
 #setwd("/Users/akpiper/Data/")
-write.csv(df, file="WORLDLIT1.0_TXT_EN_bookNLP_Supersense.csv", row.names = F)
+setwd("/Users/akpiper/Research/GPT_ConfoundingStoryGeneration_01")
+write.csv(df, file="GPT_NonFic_Neutral_bookNLP_Supersense.csv", row.names = F)
+
+
+

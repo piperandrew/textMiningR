@@ -3,41 +3,97 @@
 ######### CC By 4.0 License ##################
 library(stringi)
 library(stringr)
-#Version 1:
+
+#Version 1a:
 #this script takes as input a directory of bookNLP files
+#it outputs a random sample of sentences into a table
+
+#Version 1b:
+#this script takes as input a directory of bookNLP directories
 #it outputs a random sample of sentences into a table
 
 #Version 2:
 #outputs new bookNLP tables that are sequential subsets of the originals (i.e. sampling within the bookNLP space)
 
+
+########## Version 1a ###########
+
 #load metadata
 setwd("/Users/akpiper/Data")
 meta<-read.csv("CONLIT_META.csv")
 
-#set working directory where your source texts are located
+#set root working directory
 wd.root<-c("/Users/akpiper/Data/CONLIT_NLP/")
 
 setwd(wd.root)
 
-#get list of files
-fn<-list.files()
+#get list of folders (i.e. books)
+filenames<-list.files()
 
-#subset by categories
-fn<-fn[fn %in% meta$ID[meta$Category == "FIC"]]
+#subset by .tokens files
+file.sub<-filenames[grep(".tokens", filenames)]
+
+#normalize filenames
+file.sub<-gsub(".tokens",".txt", file.sub)
+
+#OPTION: subset by FIC
+file.sub<-file.sub[file.sub %in% meta$ID[meta$Category == "FIC"]]
+
+#establish parameters
 
 #sample n documents
-n<-100
-fn.s<-sample(fn, n)
-#fn.s<-fn
+n<-10
+fn.s<-sample(file.sub, n)
+#fn.s<-file.sub
 
 #set number of sample sentences per book (these are sequential)
-s=3
+s=50
 
 #select number of passages to extract per book (of s sequential sentences)
 pass<-1
 
-###### Version 1 ######
+#rename files
+fn.s<-gsub(".txt", ".tokens", fn.s)
 
+#create empty final table
+final.df<-NULL
+
+#for every book
+for (i in 1:length(fn.s)){
+  
+  print(i)
+  
+  #load tokens file
+  tokens.df<-read.csv(fn.s[i], quote="", sep="\t")
+  
+  for (j in 1:pass){
+    
+    #get random starting point from sentences
+    start<-sample(tokens.df$sentence_ID, 1)
+    
+    #then select s consecutive sentences
+    samp.s<-seq(from=start, to=(start+(s-1)), by=1)
+    tokens.s<-tokens.df[tokens.df$sentence_ID %in% samp.s,]
+    
+    #combine into a single passage
+    p<-paste(tokens.s$word, sep=" ", collapse=" ")
+    
+    #remove spaces between punctuation and n't
+    p<-str_replace_all(p, "\\s+(?=\\p{P})", "")
+    p<-str_replace_all(p, "\\s+(?=n’t\\b)", "")
+    
+    #build table
+    fileID<-fn.s[i]
+    temp.df<-data.frame(fileID,p)
+    final.df<-rbind(final.df, temp.df)
+  }
+}
+
+write.csv(final.df, file="", row.names = F)
+ 
+
+###### Version 1b ########
+#incomplete
 #create empty final table
 final.df<-NULL
 
@@ -80,7 +136,9 @@ for (i in 1:length(fn.s)){
   }
 }
 write.csv(final.df, file="CONLIT_Sample_100_ForConcreteness.csv", row.names = F)
- 
+
+
+
 ###### Version 2 ######
 
 #load metadata
