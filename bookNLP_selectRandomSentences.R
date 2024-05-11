@@ -328,5 +328,93 @@ for (i in 1:length(fn.s)){
   }
 }
 
+############ Takes as input a single table with concatenated documents ############
+a<-read.csv("cnn_booknlp_outputs_w_gender.csv")
+a<-read.csv("fox_booknlp_outputs_w_gender.csv")
+
+#get file names
+files<-unique(a$filename)
+
+#sample n passages
+n=3
+files.sub<-sample(files, n)
+
+#define passage length
+s=4
+
+#run
+final.df<-NULL
+for (i in 1:length(files.sub)){
+  sub<-a[a$filename == files.sub[i],]
+  sent<-unique(sub$sentenceID)
+  if(length(sent) > 10){
+    start<-sample(1:(max(sent)-10), 1)
+    sub2<-sub[sub$sentenceID %in% (seq(start, start+(s-1))),]  
+
+    #combine into a single passage
+    p<-paste(sub2$originalWord, sep=" ", collapse=" ")
+    
+    #remove spaces between punctuation and n't
+    p<-str_replace_all(p, "\\s+(?=\\p{P})", "")
+    p<-str_replace_all(p, "\\s+(?=n’t\\b)", "")
+    
+    #build table
+    fileID<-files.sub[i]
+    temp.df<-data.frame(fileID,p)
+    final.df<-rbind(final.df, temp.df)
+  }
+}
+all.df<-final.df
+all.df<-rbind(all.df, final.df)
 
 
+############ Takes as input a single directory with .tokens files ############
+setwd("/Users/akpiper/Data/FanFic_A03/FanFic_A03_15K_Sample_Queer_Short_BookNLP")
+
+#get file names
+files<-list.files()
+
+#sample n passages
+n=75
+files.sub<-sample(files, n)
+
+#define passage length
+s=4
+
+#define number of passages per book
+pass=1
+
+#create empty final table
+final.df<-NULL
+
+#for every book
+for (i in 1:length(files.sub)){
+  
+  print(i)
+  
+  #load tokens file
+  sub<-read.csv(files.sub[i], quote="", sep="\t")
+  
+  for (j in 1:pass){
+    
+    sent<-unique(sub$sentenceID)
+    
+    if(length(sent) > 10){
+      start<-sample(1:(max(sent)-10), 1)
+      sub2<-sub[sub$sentenceID %in% (seq(start, start+(s-1))),]  
+      
+      #combine into a single passage
+      p<-paste(sub2$originalWord, sep=" ", collapse=" ")
+      
+      #remove spaces between punctuation and n't
+      p<-str_replace_all(p, "\\s+(?=\\p{P})", "")
+      p<-str_replace_all(p, "\\s+(?=n’t\\b)", "")
+      
+      #build table
+      fileID<-files.sub[i]
+      temp.df<-data.frame(fileID,p)
+      final.df<-rbind(final.df, temp.df)
+    }
+  }
+}
+write.csv(final.df, file="ValidationTable_Human_FanFic.csv", row.names = F)

@@ -57,7 +57,6 @@ ggplot(b_filtered, aes(x=reorder(Feature, -Freq), y=Freq)) +
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) + # Rotate x-axis text
   labs(caption="Source: GPT-4")
 
-
 #boxplot
 #bar graph
 ggplot(df, aes(x=Class, y=value, fill=variable)) +
@@ -74,10 +73,17 @@ ggplot(df, aes(x=Class, y=value, fill=variable)) +
   #ggtitle("Percentage of ")+
   labs(caption="Source: CONLIT")
 
-#side by side plots
+#multiple plots
 #save as p1, p2 and set number of columns and rows
 library(gridExtra)
 grid.arrange(p1, p2, ncol=2)
+
+library(patchwork)
+combined_plot <- p1 + p2 + p3 +
+  plot_layout(nrow = 2, ncol = 2) #+
+#plot_annotation(title = "Wikiplots Data", 
+#                theme = theme(plot.title = element_text(hjust = 0.5, size = 16)))
+
 
 #to melt a wide format into long
 library(reshape2)

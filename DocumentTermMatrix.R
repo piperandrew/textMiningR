@@ -12,7 +12,7 @@ setwd("~/Data")
 #### Efficient version no explanation (see below) #####
 
 #for texts from a directory
-corpus1 <- VCorpus(DirSource("PWBS", encoding = "UTF-8"), readerControl=list(language="English"))
+corpus1 <- VCorpus(DirSource("Short_Combined", encoding = "UTF-8"), readerControl=list(language="English"))
 
 #for texts from a table
 #corpus1 <- VCorpus(VectorSource(my_table$text_column), readerControl = list(language = "English"))
@@ -36,6 +36,7 @@ stop<-unique(stop)
 stop<-append(stop, c("said", "one", "will"))
 stop<-append(stop, tolower(as.roman(1:1000)))
 dtm.stop<-as.matrix(dtm.scaled[ ,which(colnames(dtm.scaled) %in% stop)])
+dtm.stop<-as.matrix(corpus1.dtm[ ,which(colnames(corpus1.dtm) %in% stop)])
 
 #DTM W NO STOPWORDS + NON-SPARSE WORDS
 dtm.nostop<-dtm.scaled[ ,which(!colnames(dtm.scaled) %in% stop)]

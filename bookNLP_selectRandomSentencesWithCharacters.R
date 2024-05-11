@@ -1,6 +1,7 @@
 ######### Select Random Sentences with Characters ####################
 ######### by Andrew Piper ####################
 ######### CC By 4.0 License ##################
+library(stringr)
 
 #this script takes as input a directory of bookNLP files
 #it outputs a random sample of sentences into a table
@@ -36,14 +37,14 @@ file.sub<-unique(file.sub)
 #establish parameters
 
 #sample n documents
-n<-50
+n<-2
 fn.s<-sample(file.sub, n)
 #fn.s<-file.sub
 
 #set number of context sentences prior to target sentence with character
-c=2
+c=4
 #set number of following sentences (c+s+1 = total sentences per passage)
-s=2
+s=1
 
 #select number of passages to extract per book (of s sequential sentences)
 pass<-1
@@ -115,6 +116,9 @@ for (i in 1:length(fn.s)){
       }
     }
   
+    #get character name
+    character<-char.df$text[char.df$start_token %in% tokens.df2$token_ID_within_document[tokens.df2$sentence_ID == start]][1]
+    
     #combine into a single passage
     p<-paste(tokens.s$word, sep=" ", collapse=" ")
     
@@ -124,11 +128,12 @@ for (i in 1:length(fn.s)){
     
     #build table
     fileID<-fn.s[i]
-    temp.df<-data.frame(fileID,p)
+    temp.df<-data.frame(fileID,p, character)
     final.df<-rbind(final.df, temp.df)
   }
 }
 
+final2<-rbind(final2, final.df)
 
 setwd("/Users/akpiper/Research/Character Cognition")
 write.csv(final.df, file="Test01.csv", row.names = F)
@@ -144,6 +149,9 @@ for (i in 1:nrow(final.df)){
   write(final.df[i,2], file=final.df$ID[i])
 }
 
+#create new column for Lighttag
+test<-final2
+final2$combined<-paste(final2$character, final2$p, sep="\n\n")
 
 
 
