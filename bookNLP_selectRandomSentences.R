@@ -3,6 +3,7 @@
 ######### CC By 4.0 License ##################
 library(stringi)
 library(stringr)
+library(dplyr)
 
 #Version 1a:
 #this script takes as input a directory of bookNLP files
@@ -18,7 +19,7 @@ library(stringr)
 
 ########## Version 1a ###########
 
-#load metadata
+#metadata
 setwd("/Users/akpiper/Data")
 meta<-read.csv("CONLIT_META.csv")
 
@@ -30,30 +31,54 @@ setwd(wd.root)
 #get list of folders (i.e. books)
 filenames<-list.files()
 
-#subset by .tokens files
+#OPTION: subset by metadata
+
+#first subset by .tokens files
 file.sub<-filenames[grep(".tokens", filenames)]
 
-#normalize filenames
-file.sub<-gsub(".tokens",".txt", file.sub)
+#only FIC
+file.fic<-meta$ID[meta$Category == "FIC"]
 
-#OPTION: subset by FIC
-file.sub<-file.sub[file.sub %in% meta$ID[meta$Category == "FIC"]]
+#only 3P FIC
+fic.df<-meta[meta$ID %in% meta$ID[meta$Category == "FIC"],]
+fic.df<-fic.df[fic.df$ID %in% fic.df$ID[fic.df$Probability1P < 0.05],]
+#file.fic<-fic.df$ID
+#with specific genres
+fic.df<-fic.df[fic.df$ID %in% fic.df$ID[fic.df$Genre %in% c("NYT", "PW")],]
+file.fic<-fic.df$ID
+
+#only specific genres
+file.fic<-meta$ID[meta$Genre %in% c("NYT", "BS", "PW", "MY")]
+
+#begin subsetting
+filenames_01 <- file.sub
+filenames_02 <- file.fic
+
+# Strip extensions
+filenames_02_no_ext <- gsub("\\.txt$", "", filenames_02)
+filenames_01_no_ext <- gsub("\\.tokens$", "", filenames_01)
+
+# Subset
+file.sub<-filenames_01_no_ext[filenames_01_no_ext %in% filenames_02_no_ext]
+
+# Add .tokens
+file.sub<-paste(file.sub, ".tokens", sep="")
 
 #establish parameters
 
 #sample n documents
-n<-10
+n<-250
 fn.s<-sample(file.sub, n)
 #fn.s<-file.sub
 
 #set number of sample sentences per book (these are sequential)
-s=50
+s=3
 
 #select number of passages to extract per book (of s sequential sentences)
-pass<-1
+pass<-2
 
-#rename files
-fn.s<-gsub(".txt", ".tokens", fn.s)
+#check if all matching
+which(!fn.s %in% filenames)
 
 #create empty final table
 final.df<-NULL
@@ -89,7 +114,11 @@ for (i in 1:length(fn.s)){
   }
 }
 
-write.csv(final.df, file="", row.names = F)
+final.df2<-final.df
+
+final.df<-final.df[sample(nrow(final.df), nrow(final.df)),]
+
+write.csv(final.df, file="NarrativeDiscourse_WORLDIT_EN_Sample.csv", row.names = F)
  
 
 ###### Version 1b ########

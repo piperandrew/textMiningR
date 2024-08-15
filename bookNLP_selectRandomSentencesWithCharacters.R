@@ -22,16 +22,20 @@ setwd(wd.root)
 filenames<-list.files()
 
 #OPTION: subset by metadata
-file.sub<-sub("\\..*$", "", filenames)
-#fiction
+file.sub <- sub("\\.[^.]*$", "", filenames)
+file.sub <- gsub(".book", "", file.sub)
+
+#only fiction
 file.fic<-sub("\\..*$", "", meta$ID[meta$Category == "FIC"])
 file.sub<-file.sub[file.sub %in% file.fic]
-#3P
+#only 3P
 file.3p<-sub("\\..*$", "", meta$ID[meta$Probability1P < 0.05])
 file.sub<-file.sub[file.sub %in% file.3p]
 #remove ROM
 file.rom<-sub("\\..*$", "", meta$ID[meta$Genre == "ROM"])
 file.sub<-file.sub[!file.sub %in% file.rom]
+
+#finalize
 file.sub<-unique(file.sub)
 
 #establish parameters

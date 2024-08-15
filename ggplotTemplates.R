@@ -100,3 +100,13 @@ ggplot(data=ex, aes(x=word.count, y=value, color=variable)) +
   #ggtitle(levels(factor(kld.all$work))[n]) +
   labs(caption="Source: CONLIT")
 
+#Histogram
+ggplot(data=ex, aes(x=word.count, y=value, color=variable)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  theme_classic()+
+  theme(legend.position="none")+
+  xlab("Word Count") +
+  ylab("KLD") +
+  #ggtitle(levels(factor(kld.all$work))[n]) +
+  labs(caption="Source: CONLIT")
+

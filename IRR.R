@@ -21,6 +21,8 @@ a1<-a[,2:3]
 #Cohen's kappa on 2 raters
 kappa2(a1)
 
+
+
 ######## Per observation agreement function #######
 #this calculates how many annotators agreed on the max annotation
 calculate_agreement <- function(df) {

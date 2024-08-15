@@ -5,6 +5,7 @@
 ### Install Required Packages
 library(httr)
 library(tidyverse)
+library(R.utils)
 
 # Note: code was adapted by this blog post: https://rpubs.com/nirmal/setting_chat_gpt_R. 
 # We highly recommend you read over that blog post in detail if you are stuck at any of these steps 
@@ -14,24 +15,102 @@ library(tidyverse)
 my_API <- ""
 
 #The "hey_chatGPT function will help you access the API and prompt GPT 
-hey_chatGPT <- function(answer_my_question) {
-  chat_GPT_answer <- POST(
-    url = "https://api.openai.com/v1/chat/completions",
-    add_headers(Authorization = paste("Bearer", my_API)),
-    content_type_json(),
-    encode = "json",
-    body = list(
-      model = "gpt-4-0125-preview", #"gpt-4-0613", #gpt-4-1106-preview gpt-3.5-turbo-0301, gpt-3.5-turbo-0613, gpt-3.5-turbo-16k-0613, gpt-4-0613, gpt-4-32k
-      temperature = 0,
-      messages = list(
-        list(
-          role = "user",
-          content = answer_my_question
+#it includes a catch to move on if it hangs after 3 minutes
+#it also has a catch to manually break in R. Insert text file "text.txt"
+#in the working directory and it will halt.
+hey_chatGPT <- function(answer_my_question, timeout = 90) {
+  
+  # Check for the interruption file before starting the function
+  if (file.exists("text.txt")) {
+    cat("Interruption file detected. Exiting function immediately.\n")
+    return(NULL)
+  }
+  
+  result <- tryCatch(
+    withCallingHandlers(
+      withTimeout({
+        # Check for the interruption file again right before processing
+        if (file.exists("text.txt")) {
+          cat("Interruption file detected. Exiting function immediately.\n")
+          return(NULL)
+        }
+        
+        # Proceed with the POST request
+        chat_GPT_answer <- POST(
+          url = "https://api.openai.com/v1/chat/completions",
+          add_headers(Authorization = paste("Bearer", my_API)),
+          content_type_json(),
+          encode = "json",
+          body = list(
+            model = "gpt-4-0125-preview",  #"gpt-4o-2024-05-13", # Replace with the desired model identifier
+            temperature = 0,
+            messages = list(
+              list(
+                role = "user",
+                content = answer_my_question
+              )
+            )
+          )
+        )
+        
+        # Final check before returning the result
+        if (file.exists("text.txt")) {
+          cat("Interruption file detected. Exiting function immediately.\n")
+          return(NULL)
+        }
+        
+        return(str_trim(content(chat_GPT_answer)$choices[[1]]$message$content))
+        
+      }, timeout = timeout),
+      interrupt = function(interrupt) {
+        cat("Function was interrupted by the user.\n")
+        invokeRestart("abort")
+      }
+    ),
+    TimeoutException = function(ex) {
+      cat("Function timed out, returning NA\n")
+      return(NA)
+    },
+    error = function(e) {
+      cat("An error occurred: ", e$message, "\n")
+      return(NA)
+    }
+  )
+  
+  return(result)
+}
+
+hey_chatGPT <- function(answer_my_question, timeout = 90) {
+  result <- tryCatch(
+    withTimeout({
+      chat_GPT_answer <- POST(
+        url = "https://api.openai.com/v1/chat/completions",
+        add_headers(Authorization = paste("Bearer", my_API)),
+        content_type_json(),
+        encode = "json",
+        body = list(
+          model = "gpt-4o-2024-05-13",  #"gpt-4-0125-preview", # Replace with the desired model identifier
+          temperature = 0,
+          messages = list(
+            list(
+              role = "user",
+              content = answer_my_question
+            )
+          )
         )
       )
-    )
+      str_trim(content(chat_GPT_answer)$choices[[1]]$message$content)
+    }, timeout = timeout),
+    TimeoutException = function(ex) {
+      cat("Function timed out, returning NA\n")
+      return(NA)
+    },
+    error = function(e) {
+      cat("An error occurred: ", e$message, "\n")
+      return(NA)
+    }
   )
-  str_trim(content(chat_GPT_answer)$choices[[1]]$message$content)
+  return(result)
 }
 
 #set working directory
@@ -52,6 +131,12 @@ data<-data[1:10,]
 # Run a loop over your dataset and prompt ChatGPT - an example prompt for sentiment is given
 for (i in 1:nrow(data)) {
   print(i)
+  
+  #put in catch to break the loop if necessary
+  if (file.exists("stop_loop.txt")) {
+    cat("Stop file detected. Exiting the loop.\n")
+    break
+  }
   
   question <- "Is there a flashback in this passage? Answer only with a number: 1 if yes, 2 if no. Here is the text:"
 

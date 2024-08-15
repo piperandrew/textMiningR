@@ -170,7 +170,7 @@ ggplot(weights.sub, aes(x=reorder(feature, MeanDecreaseGini), y=MeanDecreaseGini
   xlab("Feature") +
   ylab("Weight") 
 
-######## x-fold cross validation ##########
+######## cross validation ##########
 #this runs the process for all folds
 cv.results<-lapply(folds, function(x){
   df.train<-dtm[-x,]

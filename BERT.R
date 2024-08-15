@@ -32,7 +32,7 @@ builtins <- import_builtins()
 tokenizer <- transformer$AutoTokenizer$from_pretrained('bert-large-uncased') #bert-base-uncased #bert-large-uncased
 
 #load sentences
-lit<-read_csv("ListOfMorals_Reddit_500.csv")
+lit<-read_csv("StoryMorals_Reddit_500.csv")
 
 #clean (lowercase, remove punctuaton and numbers)
 lit <- lit %>% mutate(gpt= tolower(gpt))

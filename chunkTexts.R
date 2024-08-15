@@ -31,7 +31,7 @@ text.prep<-function(x){
 }
 
 #set the chunk size
-chunk<-1000
+chunk<-500
 
 #setwd where your .txt files are stored 
 setwd("")
