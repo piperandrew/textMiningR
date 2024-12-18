@@ -6,11 +6,11 @@ library(stringr)
 library(dplyr)
 
 #Version 1a:
-#this script takes as input a directory of bookNLP files
+#this script takes as input a directory of bookNLP **files**
 #it outputs a random sample of sentences into a table
 
 #Version 1b:
-#this script takes as input a directory of bookNLP directories
+#this script takes as input a directory of bookNLP **directories**
 #it outputs a random sample of sentences into a table
 
 #Version 2:

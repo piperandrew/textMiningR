@@ -42,7 +42,7 @@ hey_chatGPT <- function(answer_my_question, timeout = 90) {
           content_type_json(),
           encode = "json",
           body = list(
-            model = "gpt-4-0125-preview",  #"gpt-4o-2024-05-13", # Replace with the desired model identifier
+            model = "gpt-4-0125-preview",#"gpt-4-0613",  #"gpt-4o-2024-05-13", # Replace with the desired model identifier
             temperature = 0,
             messages = list(
               list(

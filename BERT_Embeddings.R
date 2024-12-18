@@ -8,8 +8,6 @@
 #loads a BERT model for vectorizing each sentence
 #outputs a document-term-matrix, where rows = sentences, columns = features
 
-setwd("/Users/akpiper/Research/Story Morals")
-
 library(tidyverse)
 library(reticulate)
 library(LiblineaR)
@@ -29,22 +27,22 @@ tf = reticulate::import('tensorflow')
 builtins <- import_builtins()
 
 #establish tokenizer
-tokenizer <- transformer$AutoTokenizer$from_pretrained('bert-large-uncased') #bert-base-uncased #bert-large-uncased
+tokenizer <- transformer$AutoTokenizer$from_pretrained('bert-large-cased') #bert-base-uncased #bert-large-uncased
 
 #load sentences
-lit<-read_csv("StoryMorals_Reddit_500.csv")
+lit<-read_csv("CHICAGO_GENERICS_ALL_FINAL.csv")
 
 #clean (lowercase, remove punctuaton and numbers)
-lit <- lit %>% mutate(gpt= tolower(gpt))
-lit <- lit %>% mutate(gpt=gsub("[^[:alnum:][:space:].]", "",substr(gpt,1,nchar(gpt)-1)))
+#lit <- lit %>% mutate(gpt= tolower(gpt))
+#lit <- lit %>% mutate(gpt=gsub("[^[:alnum:][:space:].]", "",substr(gpt,1,nchar(gpt)-1)))
 
 #get sentences as single vector
-train_texts <- lit %>% select(gpt) %>% pull()
+train_texts <- lit %>% select(sentences) %>% pull()
 #train_texts <-train_texts[1:10]
 
 #load model
 train_encodings = tokenizer(train_texts, truncation=TRUE, padding=TRUE,max_length=250L)
-BERT = transformer$TFBertModel$from_pretrained("bert-large-uncased") #bert-base-uncased #bert-large-uncased
+BERT = transformer$TFBertModel$from_pretrained("bert-large-cased") #bert-base-uncased #bert-large-uncased
 
 #prepare
 ntexts_train = length(train_texts)
@@ -58,30 +56,35 @@ for (i in 1:(ntexts_train)){
   features_train[i,] = py_to_r(array_reshape(BERT(encodings_i)[[1]][[0]][[0]],c(1, no.cols)))
 }
 
-#Clustering
-install.packages("umap")
-library(umap)
+# Convert to data frame
+dtm <- as.data.frame(features_train)
+colnames(dtm) <- paste0("Feature_", 1:no.cols)
 
-# UMAP settings
-umap_config <- umap.defaults
-umap_config$n_neighbors <- 15  # You can adjust this
-umap_config$min_dist <- 0.1    # Lower values = more detailed clustering
-umap_config$n_components <- 100 # Reducing to 100 dimensions
+# Save the matrix as a .csv file
+write_csv(dtm, "document_term_matrix.csv")
 
-# Apply UMAP on the dtm
-umap_reduced <- umap(dtm, config = umap_config)
-
-#HDBSCAN
-install.packages("dbscan")
-
-# Load the package
-library(dbscan)
-
-# 'minPts' is the minimum number of points to form a cluster (you can experiment with this parameter)
-hdbscan_result <- hdbscan(pca, minPts = 30)
-
-# The clustering labels will be in hdbscan_result$cluster
-# -1 indicates noise (points that don't belong to any cluster)
-test<-table(hdbscan_result$cluster)
-
-
+# #Clustering
+# install.packages("umap")
+# library(umap)
+# 
+# # UMAP settings
+# umap_config <- umap.defaults
+# umap_config$n_neighbors <- 15  # You can adjust this
+# umap_config$min_dist <- 0.1    # Lower values = more detailed clustering
+# umap_config$n_components <- 100 # Reducing to 100 dimensions
+# 
+# # Apply UMAP on the dtm
+# umap_reduced <- umap(features_train, config = umap_config)
+# 
+# #HDBSCAN
+# install.packages("dbscan")
+# 
+# # Load the package
+# library(dbscan)
+# 
+# # 'minPts' is the minimum number of points to form a cluster (you can experiment with this parameter)
+# hdbscan_result <- hdbscan(pca, minPts = 30)
+# 
+# # The clustering labels will be in hdbscan_result$cluster
+# # -1 indicates noise (points that don't belong to any cluster)
+# test<-table(hdbscan_result$cluster)

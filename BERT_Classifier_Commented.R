@@ -44,14 +44,24 @@ model = model_class$from_pretrained(pretrained_weights, num_labels = 2)  # Adjus
 data <- read_csv("CHICAGO_Sentences_18-20M_GPT.csv")
 data <- data[sample(nrow(data), 100),]  # Downsample for testing
 
+data<-read_csv("NarraDetect_Large.csv")
+data <- data[sample(nrow(data), 100),]  # Downsample for testing
+
+
 # Prepare data for training
 data <- data %>%
   mutate(sentence = as.character(sentences),
          label = as.factor(gpt))
 
+data <- data %>%
+  mutate(sentence = tolower(as.character(Text)),
+         label = as.factor(True.Label))
+
+
+
 #establish max_length parameter, i.e. what is the distribution of length of your sentences
 summary(nchar(data$sentence))
-n=4096 #512 is the max available
+n=512 #512 is the max available
 
 # Split the data into train and test sets
 set.seed(123)
@@ -135,9 +145,9 @@ model <- transformer$TFBertForSequenceClassification$from_pretrained(
 )
 
 # Compile the model
-optimizer <- tf$keras$optimizers$Adam(learning_rate = 2e-5)
-loss <- tf$keras$losses$SparseCategoricalCrossentropy(from_logits = TRUE)
-model$compile(optimizer = optimizer, loss = loss, metrics = 'accuracy')
+#optimizer <- tf$keras$optimizers$Adam(learning_rate = 2e-5)
+#loss <- tf$keras$losses$SparseCategoricalCrossentropy(from_logits = TRUE)
+#model$compile(optimizer = optimizer, loss = loss, metrics = 'accuracy')
 
 model$compile(
   optimizer = "adam",  # Use string identifier instead of object
