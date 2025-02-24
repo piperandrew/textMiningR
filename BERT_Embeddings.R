@@ -27,7 +27,7 @@ tf = reticulate::import('tensorflow')
 builtins <- import_builtins()
 
 #establish tokenizer
-tokenizer <- transformer$AutoTokenizer$from_pretrained('bert-large-cased') #bert-base-uncased #bert-large-uncased
+tokenizer <- transformer$AutoTokenizer$from_pretrained('bert-base-uncased') #bert-base-uncased #bert-large-uncased #bert-large-cased
 
 #load sentences
 lit<-read_csv("CHICAGO_GENERICS_ALL_FINAL.csv")
@@ -37,16 +37,17 @@ lit<-read_csv("CHICAGO_GENERICS_ALL_FINAL.csv")
 #lit <- lit %>% mutate(gpt=gsub("[^[:alnum:][:space:].]", "",substr(gpt,1,nchar(gpt)-1)))
 
 #get sentences as single vector
-train_texts <- lit %>% select(sentences) %>% pull()
-#train_texts <-train_texts[1:10]
+#words<-unique(dc$t1)
+#train_texts <- lit %>% select(sentences) %>% pull()
+train_texts <-words
 
 #load model
 train_encodings = tokenizer(train_texts, truncation=TRUE, padding=TRUE,max_length=250L)
-BERT = transformer$TFBertModel$from_pretrained("bert-large-cased") #bert-base-uncased #bert-large-uncased
+BERT = transformer$TFBertModel$from_pretrained("bert-base-uncased") #bert-base-uncased #bert-large-uncased
 
 #prepare
 ntexts_train = length(train_texts)
-no.cols<-1024 #base = 768 #large = 1024
+no.cols<-768 #base = 768 #large = 1024
 features_train = matrix(NA, nrow=ntexts_train, ncol=no.cols)
 
 #Build document term matrix
@@ -59,9 +60,12 @@ for (i in 1:(ntexts_train)){
 # Convert to data frame
 dtm <- as.data.frame(features_train)
 colnames(dtm) <- paste0("Feature_", 1:no.cols)
+train_texts<-train_texts[-which(is.na(train_texts))]
+dtm<-dtm[-301,]
+row.names(dtm)<-train_texts
 
 # Save the matrix as a .csv file
-write_csv(dtm, "document_term_matrix.csv")
+write.csv(dtm, "DATA_DTM_EmotionLabels.csv", row.names = T)
 
 # #Clustering
 # install.packages("umap")

@@ -70,7 +70,11 @@ makeTransparent<-function(someColor, alpha=100)
   apply(newColor, 2, function(curcoldata){rgb(red=curcoldata[1], green=curcoldata[2],
                                               blue=curcoldata[3],alpha=alpha, maxColorValue=255)})
 }
-fw.ggplot.groups <- function(fw.ch, groups.use = as.factor(rownames(fw.ch$zeta)), max.words = 50, max.countrank = 400, colorpalette=rep("black",length(groups.use)), sizescale=2, title="Comparison of Terms by Groups", subtitle = "", caption = "Group-specific terms are ordered by Fightin' Words statistic (Monroe, et al. 2008)") {
+fw.ggplot.groups <- function(fw.ch, groups.use = as.factor(rownames(fw.ch$zeta)), max.words = 50, max.countrank = 400, colorpalette=rep("black",length(groups.use)), sizescale=2, 
+                             title="", subtitle = "", caption = "") {
+  #Optional Title and Caption:
+  #Comparison of Terms by Groups
+  #Group-specific terms are ordered by Fightin' Words statistic (Monroe, et al. 2008)
   if (is.null(dim(fw.ch$zeta))) {## two-group fw object consists of vectors, not matrices
     zetarankmat <- cbind(rank(-fw.ch$zeta),rank(fw.ch$zeta))
     colnames(zetarankmat) <- groups.use
