@@ -9,6 +9,11 @@
 #Version 1 = When all files are in a single directory
 #Version 2 = When files are located in book sub-directories
 
+#To flatten bookNLP files:
+# cd /path/to/folder
+# find . -mindepth 2 -type f -exec mv -i {} . \;
+# find . -type d -mindepth 1 -empty -delete
+
 library(dplyr)
 
 ##########################
@@ -76,7 +81,9 @@ df$filename<-gsub(".supersense", "", df$filename)
 
 write.csv(df, file="", row.names = F)
 
-####### VERSION 2 ##########
+##########################
+####### VERSION 2 ########
+##########################
 # Use this version if bookNLP files are subdirectories by book
 
 #set root working directory
