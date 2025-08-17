@@ -87,7 +87,14 @@ fw.ggplot.groups <- function(fw.ch, groups.use = as.factor(rownames(fw.ch$zeta))
   wideplotmat$term=names(countrank)
   #rankplot <- gather(wideplotmat, party, zetarank, 1:ncol(zetarankmat))
   rankplot <- gather(wideplotmat, groups.use, zetarank, 1:ncol(zetarankmat))
-  rankplot$plotsize <- sizescale*(50/(rankplot$zetarank))^(1/4)
+  
+  #change based on sizing needs
+  #based on distinctiveness (zeta)
+  #rankplot$plotsize <- sizescale*(50/(rankplot$zetarank))^(1/4)
+  
+  #based on frequency
+  rankplot$plotsize<-sizescale * (50 / (rankplot$countrank))^(1/4)
+  
   rankplot <- rankplot[rankplot$zetarank < max.words + 1 & rankplot$countrank<max.countrank+1,]
   rankplot$groups.use <- factor(rankplot$groups.use,levels=groups.use)
   
@@ -116,6 +123,7 @@ fw.keys <- function(fw.ch,n.keys=10) {
 }
 
 ########## Example ########
+
 #Using Sherlock Holmes (SHS) and Literary Short Stories (SHORT)
 corpus1 <- VCorpus(DirSource("Short_Combined", encoding = "UTF-8"), readerControl=list(language="English"))
 corpus1 <- tm_map(corpus1, content_transformer(tolower))

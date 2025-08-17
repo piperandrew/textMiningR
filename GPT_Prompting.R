@@ -132,12 +132,6 @@ data<-data[1:10,]
 for (i in 1:nrow(data)) {
   print(i)
   
-  #put in catch to break the loop if necessary
-  if (file.exists("stop_loop.txt")) {
-    cat("Stop file detected. Exiting the loop.\n")
-    break
-  }
-  
   question <- "Is there a flashback in this passage? Answer only with a number: 1 if yes, 2 if no. Here is the text:"
 
   text <- data[i,2] #change column number to match where your text is       
@@ -147,8 +141,7 @@ for (i in 1:nrow(data)) {
     result <- hey_chatGPT(concat)
     print(result)
   }
-  #print(result)
-  
+
   #specify GPT output column
   data$gpt[i] <- result
 }

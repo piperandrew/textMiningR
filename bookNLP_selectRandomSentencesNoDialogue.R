@@ -47,12 +47,17 @@ file.fic<-meta$ID[meta$Category == "FIC"]
 #begin subsetting
 filenames_01 <- file.tok
 filenames_01a <-file.quotes
-filenames_02 <- file.fic
+
+#fic only
+#filenames_02 <- file.fic
+
+#all
+filenames_02 <- meta$ID
 
 # Strip extensions
-filenames_02_no_ext <- gsub("\\.txt$", "", filenames_02)
 filenames_01_no_ext <- gsub("\\.tokens$", "", filenames_01)
 filenames_01a_no_ext <- gsub("\\.quotes$", "", filenames_01a)
+filenames_02_no_ext <- gsub("\\.txt$", "", filenames_02)
 
 # Subset
 file.sub<-filenames_01_no_ext[filenames_01_no_ext %in% filenames_02_no_ext]
@@ -68,11 +73,11 @@ file.quotes<-sample(file.quotes, n)
 
 #establish parameters
 
-#set number of sample sentences per book (these are sequential)
-s=3
+#set number of sample sentences per passage (these are sequential)
+s=1
 
 #select number of passages to extract per book (of s sequential sentences)
-pass<-1
+pass<-2
 
 #create empty final table
 final.df<-NULL
