@@ -46,7 +46,10 @@ for (i in 1:length(file.super)){
   super.table<-table(super.df$supersense_category)
     
   #normalize by word count
-  super.table<-super.table/max(super.df$end_token)
+  #super.table<-super.table/max(super.df$end_token)
+  
+  #normalize by supersense count
+  super.table<-super.table/sum(unname(super.table))
   
   #turn into data frame
   super.table<-as.data.frame(super.table)
@@ -79,7 +82,8 @@ df$filename<-filename
 #df$filename<-gsub(".supersense", ".txt", df$filename)
 df$filename<-gsub(".supersense", "", df$filename)
 
-write.csv(df, file="", row.names = F)
+#normalize by supersense count
+write.csv(df, file="txtlab450_English_SUPERSENSE_Norm2.csv", row.names = F)
 
 ##########################
 ####### VERSION 2 ########
