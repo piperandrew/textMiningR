@@ -77,8 +77,7 @@ file.quotes<-sample(file.quotes, n)
 s=1
 
 #select number of passages to extract per book (of s sequential sentences)
-pass<-2
-
+pass<-1
 #create empty final table
 final.df<-NULL
 

@@ -10,7 +10,7 @@ library(stringr)
 #it conditions on sentences containing a given supersense feature
 
 #Version 1b:
-#this script takes as input a directory of bookNLP directories
+#this script takes as input a directory of bookNLP *directories*
 #it outputs a random sample of sentences into a table
 
 ########## Version 1a ###########
